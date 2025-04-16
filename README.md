@@ -1,8 +1,13 @@
-# Introduction 
-Azure ClickOnce Sign Tool
 
-# Usage
+# Azure ClickOnce Sign Tool
 
+Command-line utility for signing ClickOnce manifests using a certificate stored in an Azure Key Vault.
+
+Forked from [davici-code/AzureSignToolClickOnce](https://github.com/davici-code/AzureSignToolClickOnce).
+
+## Usage
+
+```shell
 AzureSignToolClickOnce.exe ^\
  -p=bin\Release\app.publish\^\
  -azure-key-vault-url=https://1234-vault.vault.azure.net/^\
@@ -13,7 +18,4 @@ AzureSignToolClickOnce.exe ^\
  -timestamp-sha2=http://timestamp.globalsign.com/?signature=sha2^\
  -timestamp-rfc3161=http://rfc3161timestamp.globalsign.com/advanced^\
  -description=MyApp^
-
-
-More info on:
-https://www.davici.nl/blog/clickonce-signing-from-azure-devops-via-azure-key-vault
+```
