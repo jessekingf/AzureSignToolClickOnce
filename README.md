@@ -5,6 +5,12 @@ Command-line utility for signing ClickOnce manifests using a certificate stored 
 
 Forked from [davici-code/AzureSignToolClickOnce](https://github.com/davici-code/AzureSignToolClickOnce).
 
+## Updates
+
+The following updates have been made from the original tool:
+
+- Updated to use the new [dotnet-mage](https://github.com/dotnet/deployment-tools/blob/main/docs/dotnet-mage/README.md) tool.
+
 ## Usage
 
 ```shell
@@ -19,3 +25,15 @@ AzureSignToolClickOnce.exe ^\
  -timestamp-rfc3161=http://rfc3161timestamp.globalsign.com/advanced^\
  -description=MyApp^
 ```
+
+## Download
+
+Download the latest version [here](https://github.com/jessekingf/AzureSignToolClickOnce/releases).
+
+### Prerequisites
+
+The following prerequisites are required to run the utility:
+
+1. [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
+2. [.NET 9.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+3. [dotnet-mage](https://github.com/dotnet/deployment-tools/blob/main/docs/dotnet-mage/README.md)
