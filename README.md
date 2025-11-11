@@ -1,12 +1,21 @@
-# Introduction 
-Azure ClickOnce Sign Tool
 
-# Compiling to a single EXE for deployment
-If you want a single exe for distribution (windows platform), run the powershell script in the root dir. This simply uses ilrepack (the modern ilmerge)
-to combine the build exe with the dlls. The script runs from debug, but easy to edit to run from release. It creates a file called AzureKeyVaultSigner.exe
+# Azure ClickOnce Sign Tool
 
-# Usage (If using the compiled exe above, the executable is AzureKeyVaultSigner)
+Command-line utility for signing ClickOnce manifests using a certificate stored in an Azure Key Vault.
 
+Forked from [davici-code/AzureSignToolClickOnce](https://github.com/davici-code/AzureSignToolClickOnce).
+
+## Updates
+
+The following updates have been made from the original tool:
+
+- Use the updated [dotnet-mage](https://github.com/dotnet/deployment-tools/blob/main/docs/dotnet-mage/README.md) tool
+- Support federated authentication
+  - Exclude the `azure-key-vault-client-id` and `azure-key-vault-client-secret` to use this
+
+## Usage
+
+```shell
 AzureSignToolClickOnce.exe ^\
  -p=bin\Release\app.publish\^\
  -azure-key-vault-url=https://1234-vault.vault.azure.net/^\
@@ -17,7 +26,16 @@ AzureSignToolClickOnce.exe ^\
  -timestamp-sha2=http://timestamp.globalsign.com/?signature=sha2^\
  -timestamp-rfc3161=http://rfc3161timestamp.globalsign.com/advanced^\
  -description=MyApp^
+```
 
+## Download
 
-More info on:
-https://www.davici.nl/blog/clickonce-signing-from-azure-devops-via-azure-key-vault
+Download the latest version [here](https://github.com/jessekingf/AzureSignToolClickOnce/releases).
+
+### Prerequisites
+
+The following prerequisites are required to run the utility:
+
+1. [.NET Framework 4.8](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net48)
+2. [.NET 9.0 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+3. [dotnet-mage](https://github.com/dotnet/deployment-tools/blob/main/docs/dotnet-mage/README.md)

@@ -1,4 +1,5 @@
-﻿using Azure.Identity;
+﻿using Azure.Core;
+using Azure.Identity;
 using Azure.Security.KeyVault.Certificates;
 using AzureSign.Core;
 using AzureSignToolClickOnce.Utils;
@@ -18,7 +19,23 @@ namespace AzureSignToolClickOnce.Services
         private string _magetoolPath = @"dotnet-mage";
         public void Start(string description, string path, string timeStampUrl, string timeStampUrlRfc3161, string keyVaultUrl, string tenantId, string clientId, string clientSecret, string certName)
         {
-            var tokenCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+            TokenCredential tokenCredential;
+            if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
+            {
+                Console.WriteLine("Using federated auth.");
+                var credentialOption = new DefaultAzureCredentialOptions
+                {
+                    TenantId = tenantId,
+                    ExcludeManagedIdentityCredential = true,
+                };
+
+                tokenCredential = new DefaultAzureCredential(credentialOption);
+            }
+            else
+            {
+                tokenCredential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+            }
+
             var client = new CertificateClient(vaultUri: new Uri(keyVaultUrl), credential: tokenCredential);
             var cert = client.GetCertificate(certName).Value;
             var certificate = new X509Certificate2(cert.Cer);
@@ -149,7 +166,7 @@ namespace AzureSignToolClickOnce.Services
             signtool.OutputDataReceived += (sender, e) =>
             {
                 if (!string.IsNullOrEmpty(e.Data))
-                    Console.WriteLine($"Mage Out {e.Data}"); ;
+                    Console.WriteLine($"Mage Out {e.Data}");
             };
             signtool.ErrorDataReceived += (sender, e) =>
             {

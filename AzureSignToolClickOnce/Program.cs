@@ -70,16 +70,6 @@ namespace AzureSignToolClickOnce
                 Console.WriteLine($"Missing option -azure-key-vault-url");
                 return;
             }
-            if (string.IsNullOrEmpty(clientId))
-            {
-                Console.WriteLine($"Missing option -azure-key-vault-client-id");
-                return;
-            }
-            if (string.IsNullOrEmpty(clientSecret))
-            {
-                Console.WriteLine($"Missing option -azure-key-vault-client-secret");
-                return;
-            }
             if (string.IsNullOrEmpty(ADTenantId))
             {
                 Console.WriteLine($"Missing option -azure-key-vault-tenant-id");
