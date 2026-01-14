@@ -26,6 +26,7 @@ AzureSignToolClickOnce.exe ^\
  -timestamp-sha2=http://timestamp.globalsign.com/?signature=sha2^\
  -timestamp-rfc3161=http://rfc3161timestamp.globalsign.com/advanced^\
  -description=MyApp^
+ -additional-files="*.dll,*.bla
 ```
 
 ## Download

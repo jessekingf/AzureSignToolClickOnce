@@ -17,7 +17,18 @@ namespace AzureSignToolClickOnce.Services
     public class AzureSignToolService
     {
         private string _magetoolPath = @"dotnet-mage";
-        public void Start(string description, string path, string timeStampUrl, string timeStampUrlRfc3161, string keyVaultUrl, string tenantId, string clientId, string clientSecret, string certName)
+
+        public void Start(
+            string description,
+            string path,
+            string timeStampUrl,
+            string timeStampUrlRfc3161,
+            string keyVaultUrl,
+            string tenantId,
+            string clientId,
+            string clientSecret,
+            string certName,
+            string[] additionalFilesToSign = null)
         {
             TokenCredential tokenCredential;
             if (string.IsNullOrEmpty(clientId) || string.IsNullOrEmpty(clientSecret))
@@ -80,8 +91,27 @@ namespace AzureSignToolClickOnce.Services
             }
 
             var filesToSign = new List<string>();
+
+            // Always sign EXE files
             var setupExe = files.Where(f => ".exe".Equals(Path.GetExtension(f), StringComparison.OrdinalIgnoreCase));
             filesToSign.AddRange(setupExe);
+
+            // Sign additional files based on patterns
+            if (additionalFilesToSign != null && additionalFilesToSign.Length > 0)
+            {
+                foreach (var pattern in additionalFilesToSign)
+                {
+                    var matchingFiles = files.Where(f => MatchesPattern(Path.GetFileName(f), pattern));
+                    foreach (var matchingFile in matchingFiles)
+                    {
+                        if (!filesToSign.Any(f => f.Equals(matchingFile, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            Console.WriteLine($"Adding file to sign based on pattern '{pattern}': {Path.GetFileName(matchingFile)}");
+                            filesToSign.Add(matchingFile);
+                        }
+                    }
+                }
+            }
 
             var manifestFile = files.SingleOrDefault(f => ".manifest".Equals(Path.GetExtension(f), StringComparison.OrdinalIgnoreCase));
             if (string.IsNullOrEmpty(manifestFile))
@@ -90,8 +120,11 @@ namespace AzureSignToolClickOnce.Services
                 return;
             }
 
-            // sign the exe files
-            SignInAzureVault(description, "", timeStampUrlRfc3161, certificate, rsa, filesToSign);
+            // sign the exe and additional files
+            if (filesToSign.Any())
+            {
+                SignInAzureVault(description, "", timeStampUrlRfc3161, certificate, rsa, filesToSign);
+            }
 
             // look for the manifest file and sign that
             var args = "-a sha256RSA";
@@ -126,6 +159,14 @@ namespace AzureSignToolClickOnce.Services
             {
                 File.Move(filename, filename.Trim() + ".deploy");
             }
+        }
+
+        private bool MatchesPattern(string filename, string pattern)
+        {
+            // Convert wildcard pattern to regex
+            // Escape special regex characters except *
+            string regexPattern = "^" + System.Text.RegularExpressions.Regex.Escape(pattern).Replace("\\*", ".*") + "$";
+            return System.Text.RegularExpressions.Regex.IsMatch(filename, regexPattern, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
         }
 
         private string GetRelativeFilePath(string filePath, string basePath)

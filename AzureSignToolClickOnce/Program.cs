@@ -1,5 +1,7 @@
 ﻿using AzureSignToolClickOnce.Services;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AzureSignToolClickOnce
 {
@@ -16,6 +18,7 @@ namespace AzureSignToolClickOnce
             var clientId = string.Empty;
             var clientSecret = string.Empty;
             var certName = string.Empty;
+            var additionalFilesToSign = new List<string>();
 
             foreach (string arg in args)
             {
@@ -59,6 +62,13 @@ namespace AzureSignToolClickOnce
                     case "-description":
                         description = value;
                         break;
+                    case "-additional-files":
+                        // Support comma-separated patterns
+                        var patterns = value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                            .Select(p => p.Trim())
+                                            .Where(p => !string.IsNullOrEmpty(p));
+                        additionalFilesToSign.AddRange(patterns);
+                        break;
                     default:
                         break;
                 }
@@ -94,8 +104,23 @@ namespace AzureSignToolClickOnce
                 Console.WriteLine($"Missing option -timestamp-rfc3161");
             }
 
+            if (additionalFilesToSign.Any())
+            {
+                Console.WriteLine($"Additional files to sign: {string.Join(", ", additionalFilesToSign)}");
+            }
+
             var service = new AzureSignToolService();
-            service.Start(description, path, timeStampUrl, timeStampUrlRfc3161, keyVaultUrl, ADTenantId, clientId, clientSecret, certName);
+            service.Start(
+                description,
+                path,
+                timeStampUrl,
+                timeStampUrlRfc3161,
+                keyVaultUrl,
+                ADTenantId,
+                clientId,
+                clientSecret,
+                certName,
+                additionalFilesToSign.Any() ? additionalFilesToSign.ToArray() : null);
         }
     }
 }
